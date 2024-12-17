@@ -18,27 +18,28 @@ jobs:
       - name: Setup Google Cloud SDK
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}  # Use the GitHub secret
 
+      # Step 3: Setup Docker
       - name: Setup Docker
         uses: docker/setup-buildx-action@v2
 
-      # Step 3: Authenticate Docker to Google Artifact Registry
+      # Step 4: Authenticate Docker to Google Artifact Registry
       - name: Authenticate Docker with Google Artifact Registry
         run: |
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      # Step 4: Build the Docker Image
+      # Step 5: Build the Docker Image
       - name: Build Docker image
         run: |
           docker build -t us-central1-docker.pkg.dev/core-dev-435517/transcription-pioneer/flaskinference:0.1 .
 
-      # Step 5: Push Docker Image to Artifact Registry
+      # Step 6: Push Docker Image to Artifact Registry
       - name: Push Docker image
         run: |
           docker push us-central1-docker.pkg.dev/core-dev-435517/transcription-pioneer/flaskinference:0.1
 
-      # Step 6: Confirm successful deployment
+      # Step 7: Confirm successful deployment
       - name: Verify Image in Artifact Registry
         run: |
           gcloud artifacts docker images list \
