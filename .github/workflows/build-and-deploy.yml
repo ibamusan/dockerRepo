@@ -1,0 +1,45 @@
+name: Build and Deploy to Google Artifact Registry
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the main branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Google Cloud CLI
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v2
+
+      # Step 3: Authenticate Docker to Google Artifact Registry
+      - name: Authenticate Docker with Google Artifact Registry
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+
+      # Step 4: Build the Docker Image
+      - name: Build Docker image
+        run: |
+          docker build -t us-central1-docker.pkg.dev/core-dev-435517/transcription-pioneer/flaskinference:0.1 .
+
+      # Step 5: Push Docker Image to Artifact Registry
+      - name: Push Docker image
+        run: |
+          docker push us-central1-docker.pkg.dev/core-dev-435517/transcription-pioneer/flaskinference:0.1
+
+      # Step 6: Confirm successful deployment
+      - name: Verify Image in Artifact Registry
+        run: |
+          gcloud artifacts docker images list \
+            us-central1-docker.pkg.dev/core-dev-435517/transcription-pioneer
