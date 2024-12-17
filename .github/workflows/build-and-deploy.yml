@@ -18,7 +18,7 @@ jobs:
       - name: Setup Google Cloud SDK
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}  # Use the GitHub secret
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS_JSON }} 
 
       # Step 3: Setup Docker
       - name: Setup Docker
